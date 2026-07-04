@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DraftInk — Distraction-Free Co-writing Workspace</title>
+    <!-- Modern Typography: Merriweather for document editing, Plus Jakarta Sans for UI controls -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=4">
+</head>
+<body>
+    <div class="glow-bg"></div>
+
+    <div class="app-layout">
+        <!-- Top Navigation Header -->
+        <header class="app-header">
+            <div class="logo">
+                <span class="logo-accent">Draft</span>Ink
+            </div>
+            <div class="draft-selector-group" style="display: flex; align-items: center; gap: 8px; margin-left: 24px; margin-right: auto;">
+                <label for="draft-select" style="font-size: 12px; color: var(--text-muted); font-weight: 500; font-family: 'Plus Jakarta Sans', sans-serif;">Draft:</label>
+                <select id="draft-select" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-main); font-size: 13px; padding: 4px 8px; border-radius: 6px; font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; outline: none;">
+                    <option value="active_draft.md">active_draft.md</option>
+                </select>
+                <button id="rename-draft-btn" class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px; height: auto;">
+                    Rename
+                </button>
+            </div>
+            <div class="header-actions">
+                <button id="toggle-config" class="btn-toggle">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Configuration
+                </button>
+                <button id="toggle-ghost" class="btn-toggle">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 0-10 10c0 5.523 4.477 10 10 10s10-4.477 10-10A10 10 0 0 0 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M12 6v6l4 2"/></svg>
+                    Ghost-Text
+                </button>
+                <button id="toggle-readability" class="btn-toggle">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    Readability-Check
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="workspace-container">
+            <!-- Center Writing Canvas -->
+            <section class="editor-canvas">
+                <div class="editor-container" style="position: relative; width: 100%; height: 100%;">
+                    <textarea id="editor" placeholder="Just start writing your document here..." autofocus></textarea>
+                    <div id="editor-overlay" class="editor-overlay hidden"></div>
+                    
+                    <!-- Floating Readability Popover -->
+                    <div id="readability-popover" class="readability-popover hidden">
+                        <div class="popover-header">
+                            <span class="popover-title">Readability Tips</span>
+                            <button id="close-popover-btn" class="popover-close-btn">&times;</button>
+                        </div>
+                        <div class="popover-body">
+                            <p id="popover-sentence-stats" style="font-weight: 600; color: var(--text-main);"></p>
+                            <p id="popover-sentence-tips" class="popover-tips"></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Status Footer -->
+                <footer class="editor-footer">
+                    <div class="footer-left">
+                        <span id="save-status">Ready</span>
+                    </div>
+                    <div class="footer-right">
+                        <span id="word-count">0 words</span>
+                        <span class="footer-dot">•</span>
+                        <span id="active-model">gemini-2.5-flash</span>
+                    </div>
+                </footer>
+            </section>
+
+            <!-- Sliding Panel Container (slides in from the right) -->
+            <aside id="side-panel" class="side-panel hidden">
+                <div class="panel-header">
+                    <h3 id="panel-title">Panel Title</h3>
+                    <button id="close-panel" class="btn-close">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <div id="panel-content" class="panel-content">
+                    <!-- Dynamic Panel Content Injection -->
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Diff/Review Modal -->
+    <div id="diff-modal" class="modal-overlay hidden">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h3>Review Changes (Visual Diff)</h3>
+                <button id="close-diff-modal" class="btn-close">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="diff-body" style="padding: 16px;">
+                <div class="diff-split-container">
+                    <div class="diff-pane">
+                        <div class="pane-title">Current Version</div>
+                        <div class="pane-content" id="diff-original-content">
+                            <!-- Original text with removals highlighted in red -->
+                        </div>
+                    </div>
+                    <div class="diff-pane">
+                        <div class="pane-title">AI Suggested Version</div>
+                        <div class="pane-content" id="diff-proposed-content">
+                            <!-- Proposed text with additions highlighted in green -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div id="diff-token-usage" style="margin-right: auto; font-size: 12px; color: var(--text-muted); font-family: 'Plus Jakarta Sans', sans-serif;">
+                    API Token Usage: 0 tokens | Cost: $0.000000
+                </div>
+                <button id="reject-diff-btn" class="btn btn-secondary">Discard Changes</button>
+                <button id="accept-diff-btn" class="btn btn-primary">Accept & Replace Draft</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script imports -->
+    <script src="app.js?v=4"></script>
+</body>
+</html>

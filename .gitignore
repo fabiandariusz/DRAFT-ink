@@ -1,0 +1,15 @@
+# Python envs and caches
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Local sensitive configs and credentials
+.draft_ink.key
+config.json
+
+# Local draft documents and testing directories
+drafts/
+test_drafts_dir/
